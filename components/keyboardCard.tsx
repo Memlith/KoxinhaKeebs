@@ -1,10 +1,7 @@
-import { useSQLiteContext } from 'expo-sqlite';
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Pressable, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 
-type Keyboard = {
+export type Keyboard = {
   id: number;
-  img: string;
   name: string;
   category: string;
   description: string;
@@ -18,76 +15,53 @@ type Keyboard = {
   isCheckout: boolean;
 };
 
-export default function KeyboardCard({ category }: Keyboard) {
-  const db = useSQLiteContext();
-
-  const [keyboards, setKeyboards] = useState<Keyboard[]>([]);
-
-  useEffect(() => { loadKeyboards(); }, []);
-
-  async function loadKeyboards() {
-
-    const resultado = await db.getAllAsync(`
-        SELECT *
-        FROM keyboads
-        ORDER BY id DESC
-        WHERE category = ?
-      `) as Keyboard[]; //cast para o tipo Keyboard[]
-
-    setKeyboards(resultado);
-  }
-
+export default function KeyboardCard({
+  name,
+  description,
+  numKeys,
+  switches,
+  led,
+  hotswap,
+  avgPrice,
+  finalPrice,
+  onPressCheckout,
+  isCheckout,
+}: Keyboard) {
   return (
     <View style={styles.card}>
-      <FlatList
-        data={keyboards}
-        keyExtractor={(item) =>
-          item.id.toString()
-        }
-        renderItem={({ item }) => (
+      <Text style={styles.name}>
+        {name}
+      </Text>
 
-          <View style={styles.card}>
+      <Text>
+        {description}
+      </Text>
 
-            <Image source={{ uri: item.img }} />
+      <Text>
+        Teclas: {numKeys}
+      </Text>
 
-            <Text style={styles.name}>
-              {item.name}
-            </Text>
+      <Text>
+        Switches: {switches}
+      </Text>
 
-            <Text>
-              {item.description}
-            </Text>
+      <Text>
+        LED: {led ? 'Sim' : 'Não'}
+      </Text>
 
-            <Text>
-              Teclas: {item.numKeys}
-            </Text>
+      <Text>
+        Hotswap: {hotswap ? 'Sim' : 'Não'}
+      </Text>
 
-            <Text>
-              Switches: {item.switches}
-            </Text>
+      <Text style={styles.price}>
+        Custo Médio: R$ {Number(avgPrice || finalPrice).toFixed(2)}
+      </Text>
 
-            <Text>
-              LED: {item.led ? 'Sim' : 'Não'}
-            </Text>
-
-            <Text>
-              Hotswap: {item.hotswap ? 'Sim' : 'Não'}
-            </Text>
-
-            <Text style={styles.price}>
-              Custo Médio: R$ {Number(item.avgPrice || item.finalPrice).toFixed(2)}
-            </Text>
-
-            {!isCheckout && (
-              <Pressable style={styles.button} onPress={onPressCheckout}>
-                <Text style={styles.buttonText}>Quero esse</Text>
-              </Pressable>
-            )}
-
-          </View>
-
-        )}
-      />
+      {!isCheckout && (
+        <Pressable style={styles.button} onPress={onPressCheckout}>
+          <Text style={styles.buttonText}>Quero esse</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -109,12 +83,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
   },
 
   button: {

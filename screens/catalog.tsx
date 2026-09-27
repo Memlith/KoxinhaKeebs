@@ -1,16 +1,33 @@
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { useSQLiteContext } from 'expo-sqlite';
 import Header from '../components/header';
-import KeyboardCard from '../components/keyboardCard';
-import { keyboardLayouts } from '../data/keyboard'
+import KeyboardCard, { Keyboard } from '../components/keyboardCard';
 
-export default function Catalog({ route, navigation, props }: any) {
+export default function Catalog({ route, navigation }: any) {
+  const db = useSQLiteContext();
+
   const category = route.params.category;
 
-  const filteredKeyboards = category === 'all'
-    ? keyboardLayouts
-    : keyboardLayouts.filter(
-      keyboard => keyboard.category === category
-    );
+  const [keyboards, setKeyboards] = useState<Keyboard[]>([]);
+
+  useEffect(() => {
+    async function loadKeyboards() {
+      const resultado = await db.getAllAsync(
+        `
+          SELECT *
+          FROM keyboards
+          WHERE category = ?
+          ORDER BY id DESC
+        `,
+        category
+      ) as Keyboard[];
+
+      setKeyboards(resultado);
+    }
+
+    loadKeyboards();
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -28,17 +45,27 @@ export default function Catalog({ route, navigation, props }: any) {
       </View>
 
       <View style={styles.container}>
-        {filteredKeyboards.map((keyboard) => (
+        {keyboards.length === 0 && (
+          <Text style={styles.empty}>
+            Nenhum teclado cadastrado nesta categoria.
+          </Text>
+        )}
+
+        {keyboards.map((keyboard) => (
           <KeyboardCard
             key={keyboard.id}
+            id={keyboard.id}
             name={keyboard.name}
+            category={keyboard.category}
             description={keyboard.description}
             numKeys={keyboard.numKeys}
             switches={keyboard.switches}
             led={keyboard.led}
             hotswap={keyboard.hotswap}
             avgPrice={keyboard.avgPrice}
+            finalPrice={keyboard.finalPrice}
             onPressCheckout={() => navigation.navigate('Checkout', { id: keyboard.id })}
+            isCheckout={false}
           />
         ))}
       </View>
@@ -82,6 +109,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
   },
+
+  empty: {
+    padding: 20,
+    fontSize: 16,
+  },
+
   button: {
     backgroundColor: '#2563eb',
     padding: 16,
