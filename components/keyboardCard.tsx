@@ -1,43 +1,67 @@
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 
-type KeyboardCardProps = {
+export type Keyboard = {
   id: number;
-  img: string
   name: string;
   category: string;
+  description: string;
+  numKeys: number;
+  switches: string;
+  led: boolean;
+  hotswap: boolean;
   avgPrice: number;
-  onPressCheckout: any;
-  isChekout: boolean
+  finalPrice: number;
+  onPressCheckout: () => void;
+  isCheckout: boolean;
 };
 
-export default function KeyboardCard(props: any) {
+export default function KeyboardCard({
+  name,
+  description,
+  numKeys,
+  switches,
+  led,
+  hotswap,
+  avgPrice,
+  finalPrice,
+  onPressCheckout,
+  isCheckout,
+}: Keyboard) {
   return (
     <View style={styles.card}>
-      <Image source={props.img} />
       <Text style={styles.name}>
-        {props.name}
+        {name}
       </Text>
+
       <Text>
-        {props.description}
+        {description}
       </Text>
+
       <Text>
-        Teclas: {props.numKeys}
+        Teclas: {numKeys}
       </Text>
+
       <Text>
-        Switches: {props.switches}
+        Switches: {switches}
       </Text>
+
       <Text>
-        LED: {props.led ? 'Sim' : 'Não'}
+        LED: {led ? 'Sim' : 'Não'}
       </Text>
+
       <Text>
-        Hotswap: {props.hotswap ? 'Sim' : 'Não'}
+        Hotswap: {hotswap ? 'Sim' : 'Não'}
       </Text>
+
       <Text style={styles.price}>
-        Custo Médio: R$ {props.avgPrice}
+        Custo Médio: R$ {Number(avgPrice || finalPrice).toFixed(2)}
       </Text>
-      {!props.isCheckout && (<Pressable style={styles.button} onPress={props.onPressCheckout}>
-        <Text style={styles.buttonText} >Quero esse</Text>
-      </Pressable>)}
+
+      {!isCheckout && (
+        <Pressable style={styles.button} onPress={onPressCheckout}>
+          <Text style={styles.buttonText}>Quero esse</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -59,12 +83,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
   },
 
   button: {

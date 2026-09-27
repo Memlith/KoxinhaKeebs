@@ -1,13 +1,32 @@
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useSQLiteContext } from 'expo-sqlite';
 import Header from '../components/header';
-import { keyboardLayouts } from '../data/keyboard';
-import KeyboardCard from '../components/keyboardCard';
-export default function Checkout({ route }: any) {
+import KeyboardCard, { Keyboard } from '../components/keyboardCard';
 
-  const id = route.params.id
-  const filteredKeyboards = keyboardLayouts.filter(
-    keyboard => keyboard.id === id
-  );
+export default function Checkout({ route }: any) {
+  const db = useSQLiteContext();
+
+  const id = route.params.id;
+
+  const [keyboards, setKeyboards] = useState<Keyboard[]>([]);
+
+  useEffect(() => {
+    async function loadKeyboards() {
+      const resultado = await db.getAllAsync(
+        `
+          SELECT *
+          FROM keyboards
+          WHERE id = ?
+        `,
+        id
+      ) as Keyboard[];
+
+      setKeyboards(resultado);
+    }
+
+    loadKeyboards();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -25,17 +44,21 @@ export default function Checkout({ route }: any) {
       </View>
 
       <View style={styles.container}>
-        {filteredKeyboards.map((keyboard) => (
+        {keyboards.map((keyboard) => (
           <KeyboardCard
             key={keyboard.id}
+            id={keyboard.id}
             name={keyboard.name}
+            category={keyboard.category}
             description={keyboard.description}
             numKeys={keyboard.numKeys}
             switches={keyboard.switches}
             led={keyboard.led}
             hotswap={keyboard.hotswap}
             avgPrice={keyboard.avgPrice}
+            finalPrice={keyboard.finalPrice}
             isCheckout={true}
+            onPressCheckout={() => { }}
           />
         ))}
       </View>
