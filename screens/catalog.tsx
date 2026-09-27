@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import Header from '../components/header';
 import KeyboardCard, { Keyboard } from '../components/keyboardCard';
 
 export default function Catalog({ route, navigation }: any) {
   const db = useSQLiteContext();
-
   const category = route.params.category;
-
   const [keyboards, setKeyboards] = useState<Keyboard[]>([]);
 
   useEffect(() => {
     async function loadKeyboards() {
-      const resultado = await db.getAllAsync(
+      const result = await db.getAllAsync(
         `
           SELECT *
           FROM keyboards
@@ -23,62 +21,63 @@ export default function Catalog({ route, navigation }: any) {
         category
       ) as Keyboard[];
 
-      setKeyboards(resultado);
+      setKeyboards(result);
     }
 
-    loadKeyboards();
-  }, []);
+    void loadKeyboards();
+    return navigation.addListener('focus', loadKeyboards);
+  }, [category, db, navigation]);
 
   return (
-    <ScrollView style={styles.container}>
-      <View>
-        <Header />
-      </View>
-
-      <View style={styles.banner}>
-        <Text style={styles.title}>
-          Ergonomia e Estilo na sua rotina.
-        </Text>
-        <Text style={styles.description}>
-          Melhore seu *tec* *tec*
-        </Text>
-      </View>
-
-      <View style={styles.container}>
-        {keyboards.length === 0 && (
-          <Text style={styles.empty}>
-            Nenhum teclado cadastrado nesta categoria.
-          </Text>
-        )}
-
-        {keyboards.map((keyboard) => (
-          <KeyboardCard
-            key={keyboard.id}
-            id={keyboard.id}
-            name={keyboard.name}
-            category={keyboard.category}
-            description={keyboard.description}
-            numKeys={keyboard.numKeys}
-            switches={keyboard.switches}
-            led={keyboard.led}
-            hotswap={keyboard.hotswap}
-            avgPrice={keyboard.avgPrice}
-            finalPrice={keyboard.finalPrice}
-            onPressCheckout={() => navigation.navigate('Checkout', { id: keyboard.id })}
-            isCheckout={false}
+    <FlatList
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      data={keyboards}
+      keyExtractor={(keyboard) => keyboard.id.toString()}
+      renderItem={({ item: keyboard }) => (
+        <KeyboardCard
+          {...keyboard}
+          isCheckout={false}
+          onPressCheckout={() => navigation.navigate('Checkout', { id: keyboard.id })}
+        />
+      )}
+      ListHeaderComponent={(
+        <>
+          <Header
+            onBackPress={() => navigation.goBack()}
+            canGoBack={navigation.canGoBack()}
           />
-        ))}
-      </View>
-
-      <View>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('KeyboardCreate', { category: category })}>
-          <Text style={styles.buttonText}>
-            Novo Teclado
-          </Text>
-        </Pressable>
-      </View>
-
-    </ScrollView >
+          <View style={styles.banner}>
+            <Text style={styles.title}>
+              Ergonomia e estilo na sua rotina.
+            </Text>
+            <Text style={styles.description}>
+              Melhore seu tec tec.
+            </Text>
+          </View>
+        </>
+      )}
+      ListEmptyComponent={(
+        <Text style={styles.empty}>
+          Nenhum teclado cadastrado nesta categoria.
+        </Text>
+      )}
+      ListFooterComponent={(
+        <View style={styles.footer}>
+          <Pressable
+            style={styles.button}
+            onPress={() => navigation.navigate('KeyboardCreate', { category })}
+            accessibilityRole='button'
+            accessibilityLabel='Cadastrar novo teclado'
+            accessibilityHint='Abre o formulário para criar um teclado nesta categoria'
+          >
+            <Text style={styles.buttonText}>
+              Novo Teclado
+            </Text>
+          </Pressable>
+        </View>
+      )}
+    />
   );
 }
 
@@ -87,13 +86,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  header: {
-    padding: 20,
-  },
-
-  logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  content: {
+    paddingBottom: 20,
   },
 
   banner: {
@@ -115,12 +109,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
+  footer: {
+    paddingHorizontal: 10,
+  },
+
   button: {
     backgroundColor: '#2563eb',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 20,
   },
 
   buttonText: {

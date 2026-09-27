@@ -1,18 +1,22 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 
 export type Keyboard = {
   id: number;
   name: string;
   category: string;
-  description: string;
+  description: string | null;
   numKeys: number;
   switches: string;
-  led: boolean;
-  hotswap: boolean;
+  led: boolean | number;
+  hotswap: boolean | number;
   avgPrice: number;
   finalPrice: number;
-  onPressCheckout: () => void;
-  isCheckout: boolean;
+  imageUrl?: string | null;
+};
+
+type KeyboardCardProps = Keyboard & {
+  onPressCheckout?: () => void;
+  isCheckout?: boolean;
 };
 
 export default function KeyboardCard({
@@ -26,12 +30,21 @@ export default function KeyboardCard({
   finalPrice,
   onPressCheckout,
   isCheckout,
-}: Keyboard) {
+  imageUrl,
+}: KeyboardCardProps) {
   return (
     <View style={styles.card}>
       <Text style={styles.name}>
         {name}
       </Text>
+
+      {imageUrl && (
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.image}
+          accessibilityLabel={`Imagem do teclado ${name}`}
+        />
+      )}
 
       <Text>
         {description}
@@ -46,19 +59,25 @@ export default function KeyboardCard({
       </Text>
 
       <Text>
-        LED: {led ? 'Sim' : 'Não'}
+        LED: {Boolean(led) ? 'Sim' : 'Não'}
       </Text>
 
       <Text>
-        Hotswap: {hotswap ? 'Sim' : 'Não'}
+        Hotswap: {Boolean(hotswap) ? 'Sim' : 'Não'}
       </Text>
 
       <Text style={styles.price}>
-        Custo Médio: R$ {Number(avgPrice || finalPrice).toFixed(2)}
+        Preço: R$ {Number(finalPrice || avgPrice).toFixed(2)}
       </Text>
 
       {!isCheckout && (
-        <Pressable style={styles.button} onPress={onPressCheckout}>
+        <Pressable
+          style={styles.button}
+          onPress={onPressCheckout}
+          accessibilityRole='button'
+          accessibilityLabel={`Comprar o teclado ${name}`}
+          accessibilityHint='Abre a tela para confirmar o pedido'
+        >
           <Text style={styles.buttonText}>Quero esse</Text>
         </Pressable>
       )}
@@ -83,6 +102,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
+  },
+
+  image: {
+    width: '100%',
+    height: 180,
+    borderRadius: 8,
+    marginTop: 12,
+    marginBottom: 12,
   },
 
   button: {
