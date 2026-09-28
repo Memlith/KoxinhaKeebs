@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import Header from '../components/header';
-import KeyboardCard, { Keyboard } from '../components/keyboardCard';
+import KeyboardCard from '../components/keyboardCard';
+import type { Keyboard } from '../data/keyboard';
 
 export default function Catalog({ route, navigation }: any) {
   const db = useSQLiteContext();
-
   const category = route.params.category;
-
   const [keyboards, setKeyboards] = useState<Keyboard[]>([]);
 
   useEffect(() => {
     async function loadKeyboards() {
-      const resultado = await db.getAllAsync(
+      const result = await db.getAllAsync(
         `
           SELECT *
           FROM keyboards
@@ -23,77 +22,60 @@ export default function Catalog({ route, navigation }: any) {
         category
       ) as Keyboard[];
 
-      setKeyboards(resultado);
+      setKeyboards(result);
     }
 
-    loadKeyboards();
-  }, []);
+    void loadKeyboards();
+  }, [category, db]);
+
+  function buyNow(keyboard: Keyboard) {
+    navigation.navigate('Carrinho', { id: keyboard.id });
+  }
 
   return (
-    <ScrollView style={styles.container}>
-      <View>
-        <Header />
-      </View>
-
-      <View style={styles.banner}>
-        <Text style={styles.title}>
-          Ergonomia e Estilo na sua rotina.
-        </Text>
-        <Text style={styles.description}>
-          Melhore seu *tec* *tec*
-        </Text>
-      </View>
-
-      <View style={styles.container}>
-        {keyboards.length === 0 && (
-          <Text style={styles.empty}>
-            Nenhum teclado cadastrado nesta categoria.
-          </Text>
-        )}
-
-        {keyboards.map((keyboard) => (
+    <View style={styles.container}>
+      <FlatList
+        data={keyboards}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
           <KeyboardCard
-            key={keyboard.id}
-            id={keyboard.id}
-            name={keyboard.name}
-            category={keyboard.category}
-            description={keyboard.description}
-            numKeys={keyboard.numKeys}
-            switches={keyboard.switches}
-            led={keyboard.led}
-            hotswap={keyboard.hotswap}
-            avgPrice={keyboard.avgPrice}
-            finalPrice={keyboard.finalPrice}
-            onPressCheckout={() => navigation.navigate('Checkout', { id: keyboard.id })}
-            isCheckout={false}
+            {...item}
+            onBuyNow={() => buyNow(item)}
           />
-        ))}
-      </View>
+        )}
+        ListHeaderComponent={
+          <View>
+            <Header />
 
-      <View>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('KeyboardCreate', { category: category })}>
+            <View style={styles.banner}>
+              <Text style={styles.title}>
+                Ergonomia e estilo na sua rotina.
+              </Text>
+              <Text style={styles.description}>
+                Melhore seu tec tec.
+              </Text>
+            </View>
+          </View>
+        }
+        />
+
+      <View style={styles.footer}>
+        <Pressable
+          style={styles.button}
+          onPress={() => navigation.navigate('Crie um Teclado', { category })}
+        >
           <Text style={styles.buttonText}>
             Novo Teclado
           </Text>
         </Pressable>
       </View>
-
-    </ScrollView >
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-
-  header: {
-    padding: 20,
-  },
-
-  logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
   },
 
   banner: {
@@ -110,9 +92,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  empty: {
+  footer: {
     padding: 20,
-    fontSize: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
   },
 
   button: {
@@ -120,7 +103,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 20,
   },
 
   buttonText: {

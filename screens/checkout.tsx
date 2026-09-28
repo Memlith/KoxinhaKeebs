@@ -1,70 +1,102 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Alert, ScrollView } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import Header from '../components/header';
-import KeyboardCard, { Keyboard } from '../components/keyboardCard';
+import KeyboardCard from '../components/keyboardCard';
+import type { Keyboard } from '../data/keyboard';
 
-export default function Checkout({ route }: any) {
+export default function Checkout({ route, navigation }: any) {
   const db = useSQLiteContext();
-
   const id = route.params.id;
-
-  const [keyboards, setKeyboards] = useState<Keyboard[]>([]);
+  const [keyboard, setKeyboard] = useState<Keyboard | null>(null);
 
   useEffect(() => {
-    async function loadKeyboards() {
-      const resultado = await db.getAllAsync(
+    async function loadKeyboard() {
+      const result = await db.getFirstAsync(
         `
           SELECT *
           FROM keyboards
           WHERE id = ?
         `,
         id
-      ) as Keyboard[];
+      ) as Keyboard | null;
 
-      setKeyboards(resultado);
+      setKeyboard(result);
     }
 
-    loadKeyboards();
-  }, []);
+    void loadKeyboard();
+  }, [db, id]);
+
+  const totalPrice = keyboard
+    ? Number(keyboard.finalPrice || keyboard.avgPrice)
+    : 0;
+
+  async function finishOrder() {
+    if (!keyboard) {
+      return;
+    }
+
+    await db.runAsync(
+      `INSERT INTO orders (keyboardId, keyboardName, totalPrice)
+       VALUES (?, ?, ?)`,
+      keyboard.id,
+      keyboard.name,
+      totalPrice,
+    );
+
+    Alert.alert(
+      'Pedido confirmado!',
+      'Seu pedido foi salvo neste dispositivo.',
+      [
+        {
+          text: 'Voltar ao início',
+          onPress: () => navigation.navigate('Home'),
+        },
+      ]
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <Header />
-      </View>
 
-      <View style={styles.banner}>
-        <Text style={styles.title}>
-          Seu Teclado já é quase seu!
-        </Text>
-        <Text style={styles.description}>
-          So falta confirmar o Pedido
-        </Text>
-      </View>
+        <View style={styles.banner}>
+          <Text style={styles.title}>
+            Seu teclado já é quase seu!
+          </Text>
+          <Text style={styles.description}>
+            Só falta confirmar o pedido.
+          </Text>
+        </View>
 
-      <View style={styles.container}>
-        {keyboards.map((keyboard) => (
-          <KeyboardCard
-            key={keyboard.id}
-            id={keyboard.id}
-            name={keyboard.name}
-            category={keyboard.category}
-            description={keyboard.description}
-            numKeys={keyboard.numKeys}
-            switches={keyboard.switches}
-            led={keyboard.led}
-            hotswap={keyboard.hotswap}
-            avgPrice={keyboard.avgPrice}
-            finalPrice={keyboard.finalPrice}
-            isCheckout={true}
-            onPressCheckout={() => { }}
-          />
-        ))}
-      </View>
-      <View style={styles.container}>
-        <Pressable style={styles.button}>
-          <Text style={styles.buttonText} >Finalizar Compra</Text>
+        <View style={styles.content}>
+          {keyboard ? (
+            <>
+              <KeyboardCard {...keyboard} />
+
+              <View style={styles.total}>
+                <Text style={styles.totalLabel}>
+                  Total: R$ {totalPrice.toFixed(2)}
+                </Text>
+              </View>
+            </>
+          ) : (
+            <Text style={styles.empty}>
+              Carregando teclado...
+            </Text>
+          )}
+        </View>
+      </ScrollView>
+
+      <View style={styles.footer}>
+        <Pressable
+          style={styles.button}
+          onPress={finishOrder}
+        >
+          <Text style={styles.buttonText}>
+            Finalizar Compra
+          </Text>
         </Pressable>
       </View>
     </View>
@@ -76,13 +108,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  header: {
-    padding: 20,
-  },
-
-  logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  scrollContent: {
+    paddingBottom: 20,
   },
 
   banner: {
@@ -98,11 +125,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
   },
+
+  content: {
+    flexGrow: 1,
+  },
+
+  total: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+
+  totalLabel: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
+  empty: {
+    padding: 20,
+    fontSize: 16,
+  },
+
+  footer: {
+    padding: 20,
+  },
+
   button: {
     backgroundColor: '#222',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 8,
+    alignItems: 'center',
   },
 
   buttonText: {

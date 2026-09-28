@@ -16,6 +16,15 @@ export async function startDatabase(db: SQLiteDatabase) {
         avgBuildDays INTEGER NOT NULL,
         avgPrice INTEGER DEFAULT 0,
         finalPrice INTEGER DEFAULT 0,
+        imageUrl TEXT,
+        createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        keyboardId INTEGER NOT NULL,
+        keyboardName TEXT NOT NULL,
+        totalPrice REAL NOT NULL,
         createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
     `)

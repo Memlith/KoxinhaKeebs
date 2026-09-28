@@ -4,6 +4,7 @@ import Home from './screens/home';
 import Catalog from './screens/catalog'
 import Checkout from './screens/checkout'
 import KeyboardCreate from './screens/keyboardCreate';
+import Orders from './screens/orders';
 import { SQLiteProvider } from 'expo-sqlite';
 import { startDatabase } from './database/database';
 
@@ -20,16 +21,20 @@ export default function App() {
             component={Home}
           />
           <Stack.Screen
-            name="Catalog"
+            name="Catálogo"
             component={Catalog}
           />
           <Stack.Screen
-            name="KeyboardCreate"
+            name="Crie um Teclado"
             component={KeyboardCreate}
           />
           <Stack.Screen
-            name="Checkout"
+            name="Carrinho"
             component={Checkout}
+          />
+          <Stack.Screen
+            name="Pedidos"
+            component={Orders}
           />
 
         </Stack.Navigator>
