@@ -12,6 +12,7 @@ export interface KeyboardLayout {
   avgBuildDays: number
   avgPrice: number
   createdAt: string
+  imageUrl?: string
 }
 
 export const keyboardLayouts: KeyboardLayout[] = [

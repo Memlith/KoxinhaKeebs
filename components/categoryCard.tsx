@@ -1,6 +1,5 @@
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 
 export default function CategoryCard(props: any) {
   const navigation: any = useNavigation();
@@ -10,11 +9,12 @@ export default function CategoryCard(props: any) {
       onPress={() => navigation.navigate('Catalog', { category: props.category })}
     >
       <View style={styles.card}>
-        <Image source={props.img} />
-        <Text>{props.icon}</Text>
+        <Text style={styles.icon}>{props.icon}</Text>
+
         <Text style={styles.name}>
           {props.name}
         </Text>
+
         <Text style={styles.description}>
           {props.description}
         </Text>
@@ -34,6 +34,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+
+  icon: {
+    fontSize: 28,
+    marginBottom: 8,
   },
 
   description: {

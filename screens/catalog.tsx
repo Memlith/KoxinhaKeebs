@@ -6,14 +6,12 @@ import KeyboardCard, { Keyboard } from '../components/keyboardCard';
 
 export default function Catalog({ route, navigation }: any) {
   const db = useSQLiteContext();
-
   const category = route.params.category;
-
   const [keyboards, setKeyboards] = useState<Keyboard[]>([]);
 
   useEffect(() => {
     async function loadKeyboards() {
-      const resultado = await db.getAllAsync(
+      const result = await db.getAllAsync(
         `
           SELECT *
           FROM keyboards
@@ -23,28 +21,27 @@ export default function Catalog({ route, navigation }: any) {
         category
       ) as Keyboard[];
 
-      setKeyboards(resultado);
+      setKeyboards(result);
     }
 
-    loadKeyboards();
-  }, []);
+    void loadKeyboards();
+    return navigation.addListener('focus', loadKeyboards);
+  }, [category, db, navigation]);
 
   return (
-    <ScrollView style={styles.container}>
-      <View>
-        <Header />
-      </View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Header />
 
       <View style={styles.banner}>
         <Text style={styles.title}>
-          Ergonomia e Estilo na sua rotina.
+          Ergonomia e estilo na sua rotina.
         </Text>
         <Text style={styles.description}>
-          Melhore seu *tec* *tec*
+          Melhore seu tec tec.
         </Text>
       </View>
 
-      <View style={styles.container}>
+      <View>
         {keyboards.length === 0 && (
           <Text style={styles.empty}>
             Nenhum teclado cadastrado nesta categoria.
@@ -54,31 +51,24 @@ export default function Catalog({ route, navigation }: any) {
         {keyboards.map((keyboard) => (
           <KeyboardCard
             key={keyboard.id}
-            id={keyboard.id}
-            name={keyboard.name}
-            category={keyboard.category}
-            description={keyboard.description}
-            numKeys={keyboard.numKeys}
-            switches={keyboard.switches}
-            led={keyboard.led}
-            hotswap={keyboard.hotswap}
-            avgPrice={keyboard.avgPrice}
-            finalPrice={keyboard.finalPrice}
-            onPressCheckout={() => navigation.navigate('Checkout', { id: keyboard.id })}
+            {...keyboard}
             isCheckout={false}
+            onPressCheckout={() => navigation.navigate('Checkout', { id: keyboard.id })}
           />
         ))}
       </View>
 
-      <View>
-        <Pressable style={styles.button} onPress={() => navigation.navigate('KeyboardCreate', { category: category })}>
+      <View style={styles.footer}>
+        <Pressable
+          style={styles.button}
+          onPress={() => navigation.navigate('KeyboardCreate', { category })}
+        >
           <Text style={styles.buttonText}>
             Novo Teclado
           </Text>
         </Pressable>
       </View>
-
-    </ScrollView >
+    </ScrollView>
   );
 }
 
@@ -87,13 +77,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  header: {
-    padding: 20,
-  },
-
-  logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  content: {
+    paddingBottom: 20,
   },
 
   banner: {
@@ -115,12 +100,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
+  footer: {
+    paddingHorizontal: 20,
+  },
+
   button: {
     backgroundColor: '#2563eb',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 20,
   },
 
   buttonText: {
