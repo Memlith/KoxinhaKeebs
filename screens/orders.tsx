@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import Header from '../components/header';
 
@@ -31,7 +31,7 @@ export default function Orders() {
   }, [db]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Header />
 
       <View style={styles.banner}>
@@ -60,7 +60,7 @@ export default function Orders() {
           </View>
         )}
       />
-    </View>
+    </ScrollView>
   );
 }
 

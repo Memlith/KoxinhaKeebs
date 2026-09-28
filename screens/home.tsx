@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import Header from '../components/header';
 import CategoryCard from '../components/categoryCard';
 
 export default function Home({ navigation }: any) {
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.content}>
         <View>
           <Header />
@@ -52,7 +52,7 @@ export default function Home({ navigation }: any) {
           </Text>
         </Pressable>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
