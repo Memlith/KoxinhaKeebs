@@ -1,22 +1,8 @@
 import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
-
-export type Keyboard = {
-  id: number;
-  name: string;
-  category: string;
-  description: string | null;
-  numKeys: number;
-  switches: string;
-  led: boolean | number;
-  hotswap: boolean | number;
-  avgPrice: number;
-  finalPrice: number;
-  imageUrl?: string | null;
-};
+import type { Keyboard } from '../data/keyboard';
 
 type KeyboardCardProps = Keyboard & {
-  onPressCheckout?: () => void;
-  isCheckout?: boolean;
+  onBuyNow?: () => void;
 };
 
 export default function KeyboardCard({
@@ -28,8 +14,7 @@ export default function KeyboardCard({
   hotswap,
   avgPrice,
   finalPrice,
-  onPressCheckout,
-  isCheckout,
+  onBuyNow,
   imageUrl,
 }: KeyboardCardProps) {
   return (
@@ -69,12 +54,12 @@ export default function KeyboardCard({
         Preço: R$ {Number(finalPrice || avgPrice).toFixed(2)}
       </Text>
 
-      {!isCheckout && (
+      {onBuyNow && (
         <Pressable
           style={styles.button}
-          onPress={onPressCheckout}
+          onPress={onBuyNow}
         >
-          <Text style={styles.buttonText}>Quero esse</Text>
+          <Text style={styles.buttonText}>Comprar agora</Text>
         </Pressable>
       )}
     </View>

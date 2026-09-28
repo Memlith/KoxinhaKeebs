@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, FlatList } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import Header from '../components/header';
-import KeyboardCard, { Keyboard } from '../components/keyboardCard';
+import KeyboardCard from '../components/keyboardCard';
+import type { Keyboard } from '../data/keyboard';
 
 export default function Catalog({ route, navigation }: any) {
   const db = useSQLiteContext();
@@ -25,60 +26,56 @@ export default function Catalog({ route, navigation }: any) {
     }
 
     void loadKeyboards();
-    return navigation.addListener('focus', loadKeyboards);
-  }, [category, db, navigation]);
+  }, [category, db]);
+
+  function buyNow(keyboard: Keyboard) {
+    navigation.navigate('Carrinho', { id: keyboard.id });
+  }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Header />
-
-      <View style={styles.banner}>
-        <Text style={styles.title}>
-          Ergonomia e estilo na sua rotina.
-        </Text>
-        <Text style={styles.description}>
-          Melhore seu tec tec.
-        </Text>
-      </View>
-
-      <View>
-        {keyboards.length === 0 && (
-          <Text style={styles.empty}>
-            Nenhum teclado cadastrado nesta categoria.
-          </Text>
-        )}
-
-        {keyboards.map((keyboard) => (
+    <View style={styles.container}>
+      <FlatList
+        data={keyboards}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
           <KeyboardCard
-            key={keyboard.id}
-            {...keyboard}
-            isCheckout={false}
-            onPressCheckout={() => navigation.navigate('Checkout', { id: keyboard.id })}
+            {...item}
+            onBuyNow={() => buyNow(item)}
           />
-        ))}
-      </View>
+        )}
+        ListHeaderComponent={
+          <View>
+            <Header />
+
+            <View style={styles.banner}>
+              <Text style={styles.title}>
+                Ergonomia e estilo na sua rotina.
+              </Text>
+              <Text style={styles.description}>
+                Melhore seu tec tec.
+              </Text>
+            </View>
+          </View>
+        }
+        />
 
       <View style={styles.footer}>
         <Pressable
           style={styles.button}
-          onPress={() => navigation.navigate('KeyboardCreate', { category })}
+          onPress={() => navigation.navigate('Crie um Teclado', { category })}
         >
           <Text style={styles.buttonText}>
             Novo Teclado
           </Text>
         </Pressable>
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-
-  content: {
-    paddingBottom: 20,
   },
 
   banner: {
@@ -95,13 +92,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  empty: {
-    padding: 20,
-    fontSize: 16,
-  },
-
   footer: {
-    paddingHorizontal: 20,
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
   },
 
   button: {

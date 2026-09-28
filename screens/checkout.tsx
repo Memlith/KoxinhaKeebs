@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Alert, ScrollView } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import Header from '../components/header';
-import KeyboardCard, { Keyboard } from '../components/keyboardCard';
+import KeyboardCard from '../components/keyboardCard';
+import type { Keyboard } from '../data/keyboard';
 
 export default function Checkout({ route, navigation }: any) {
   const db = useSQLiteContext();
@@ -26,12 +27,14 @@ export default function Checkout({ route, navigation }: any) {
     void loadKeyboard();
   }, [db, id]);
 
+  const totalPrice = keyboard
+    ? Number(keyboard.finalPrice || keyboard.avgPrice)
+    : 0;
+
   async function finishOrder() {
     if (!keyboard) {
       return;
     }
-
-    const totalPrice = Number(keyboard.finalPrice || keyboard.avgPrice);
 
     await db.runAsync(
       `INSERT INTO orders (keyboardId, keyboardName, totalPrice)
@@ -69,7 +72,15 @@ export default function Checkout({ route, navigation }: any) {
 
         <View style={styles.content}>
           {keyboard ? (
-            <KeyboardCard {...keyboard} isCheckout />
+            <>
+              <KeyboardCard {...keyboard} />
+
+              <View style={styles.total}>
+                <Text style={styles.totalLabel}>
+                  Total: R$ {totalPrice.toFixed(2)}
+                </Text>
+              </View>
+            </>
           ) : (
             <Text style={styles.empty}>
               Carregando teclado...
@@ -117,6 +128,16 @@ const styles = StyleSheet.create({
 
   content: {
     flexGrow: 1,
+  },
+
+  total: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+
+  totalLabel: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 
   empty: {

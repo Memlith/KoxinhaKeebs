@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Pressable, Switch, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useState } from 'react';
 import Header from '../components/header';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -10,29 +10,15 @@ export default function KeyboardCreate({ navigation, route }: any) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [numKeys, setNumKeys] = useState('');
-  const [led, setLed] = useState(false);
-  const [hotswap, setHotswap] = useState(false);
   const [switches, setSwitches] = useState('');
+  const [buildDays, setBuildDays] = useState('');
+  const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-
-  function calcAvgDays(keys: number, keyboardCategory: string, hasLed: boolean, hasHotswap: boolean): number {
-    const halfKeys = keys * 0.5;
-    let hours = halfKeys;
-
-    if (hasLed) hours += halfKeys;
-    if (hasHotswap) hours += halfKeys;
-    if (keyboardCategory === 'macropad') hours += halfKeys;
-    if (keyboardCategory === 'splitKeyboard') hours += keys;
-
-    return Math.ceil(hours / 24);
-  }
-
-  function calcPrice(days: number): number {
-    return Math.round(days * 50);
-  }
 
   async function saveKeyboard() {
     const totalKeys = Number(numKeys);
+    const totalDays = Number(buildDays) || 1;
+    const totalPrice = Number(price);
 
     if (!name.trim()) {
       Alert.alert('Atenção', 'Informe o nome do teclado.');
@@ -49,23 +35,25 @@ export default function KeyboardCreate({ navigation, route }: any) {
       return;
     }
 
-    const calculatedBuildDays = calcAvgDays(totalKeys, category, led, hotswap);
-    const calculatedPrice = calcPrice(calculatedBuildDays);
+    if (!price || totalPrice <= 0) {
+      Alert.alert('Atenção', 'Informe um preço válido.');
+      return;
+    }
 
     await db.runAsync(
       `INSERT INTO keyboards
         (name, description, category, numKeys, led, hotswap, switches, avgBuildDays, avgPrice, finalPrice, imageUrl)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      name,
+      name.trim(),
       description,
       category,
       totalKeys,
-      led ? 1 : 0,
-      hotswap ? 1 : 0,
+      0,
+      0,
       switches,
-      calculatedBuildDays,
-      calculatedPrice,
-      calculatedPrice,
+      totalDays,
+      totalPrice,
+      totalPrice,
       imageUrl || null,
     );
 
@@ -83,9 +71,9 @@ export default function KeyboardCreate({ navigation, route }: any) {
     setName('');
     setDescription('');
     setNumKeys('');
-    setLed(false);
-    setHotswap(false);
     setSwitches('');
+    setBuildDays('');
+    setPrice('');
     setImageUrl('');
   }
 
@@ -121,30 +109,15 @@ export default function KeyboardCreate({ navigation, route }: any) {
           placeholder='Descreva seu teclado'
           value={description}
           onChangeText={setDescription}
-          multiline
         />
 
         <Text style={styles.label}>Teclas*</Text>
         <TextInput
           style={styles.input}
           placeholder='Exemplo: 86'
-          keyboardType='number-pad'
+          keyboardType='decimal-pad'
           value={numKeys}
-          onChangeText={(text) => setNumKeys(text.replace(/[^0-9]/g, ''))}
-        />
-
-        <Text style={styles.label}>RGB</Text>
-        <Switch
-          value={led}
-          onValueChange={setLed}
-          style={styles.switch}
-        />
-
-        <Text style={styles.label}>Hotswap</Text>
-        <Switch
-          value={hotswap}
-          onValueChange={setHotswap}
-          style={styles.switch}
+          onChangeText={setNumKeys}
         />
 
         <Text style={styles.label}>Switches*</Text>
@@ -155,15 +128,30 @@ export default function KeyboardCreate({ navigation, route }: any) {
           onChangeText={setSwitches}
         />
 
+        <Text style={styles.label}>Dias de montagem</Text>
+        <TextInput
+          style={styles.input}
+          placeholder='Exemplo: 2'
+          keyboardType='decimal-pad'
+          value={buildDays}
+          onChangeText={setBuildDays}
+        />
+
+        <Text style={styles.label}>Preço*</Text>
+        <TextInput
+          style={styles.input}
+          placeholder='Digite o preço'
+          keyboardType='decimal-pad'
+          value={price}
+          onChangeText={setPrice}
+        />
+
         <Text style={styles.label}>URL da imagem</Text>
         <TextInput
           style={styles.input}
           placeholder='https://exemplo.com/teclado.jpg'
           value={imageUrl}
           onChangeText={setImageUrl}
-          keyboardType='url'
-          autoCapitalize='none'
-          autoCorrect={false}
         />
 
         <Pressable
@@ -217,10 +205,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    marginBottom: 20,
-  },
-
-  switch: {
     marginBottom: 20,
   },
 
