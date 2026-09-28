@@ -1,5 +1,4 @@
 import type { SQLiteDatabase } from 'expo-sqlite'
-import { keyboardLayouts } from '../data/keyboard'
 
 export async function startDatabase(db: SQLiteDatabase) {
   await db.execAsync(`
@@ -29,30 +28,4 @@ export async function startDatabase(db: SQLiteDatabase) {
         createdAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
     `)
-
-  const count = await db.getFirstAsync<{ total: number }>(
-    'SELECT COUNT(*) as total FROM keyboards'
-  )
-
-  if (count?.total === 0) {
-    for (const keyboard of keyboardLayouts) {
-      await db.runAsync(
-        `INSERT INTO keyboards
-          (name, description, category, numKeys, led, hotswap, switches, avgBuildDays, avgPrice, finalPrice, imageUrl, createdAt)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        keyboard.name,
-        keyboard.description,
-        keyboard.category,
-        keyboard.numKeys,
-        keyboard.led ? 1 : 0,
-        keyboard.hotswap ? 1 : 0,
-        keyboard.switches,
-        keyboard.avgBuildDays,
-        keyboard.avgPrice,
-        keyboard.avgPrice,
-        keyboard.imageUrl ?? null,
-        keyboard.createdAt,
-      )
-    }
-  }
 }

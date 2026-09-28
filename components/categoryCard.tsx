@@ -6,7 +6,7 @@ export default function CategoryCard(props: any) {
 
   return (
     <Pressable
-      onPress={() => navigation.navigate('Catalog', { category: props.category })}
+      onPress={() => navigation.navigate('Catálogo', { category: props.category })}
     >
       <View style={styles.card}>
         <Text style={styles.icon}>{props.icon}</Text>
