@@ -10,6 +10,8 @@ export default function KeyboardCreate({ navigation, route }: any) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [numKeys, setNumKeys] = useState('');
+  const [led, setLed] = useState('');
+  const [hotswap, setHotswap] = useState('');
   const [switches, setSwitches] = useState('');
   const [buildDays, setBuildDays] = useState('');
   const [price, setPrice] = useState('');
@@ -27,6 +29,16 @@ export default function KeyboardCreate({ navigation, route }: any) {
 
     if (!Number.isInteger(totalKeys) || totalKeys <= 0) {
       Alert.alert('Atenção', 'Informe uma quantidade inteira de teclas.');
+      return;
+    }
+
+    if (!['1', '0'].includes(led.trim())) {
+      Alert.alert('Atenção', 'Informe 1 ou 0 para o LED.');
+      return;
+    }
+
+    if (!['1', '0'].includes(hotswap.trim())) {
+      Alert.alert('Atenção', 'Informe 1 ou 0 para o hotswap.');
       return;
     }
 
@@ -48,8 +60,8 @@ export default function KeyboardCreate({ navigation, route }: any) {
       description,
       category,
       totalKeys,
-      0,
-      0,
+      Number(led),
+      Number(hotswap),
       switches,
       totalDays,
       totalPrice,
@@ -71,6 +83,8 @@ export default function KeyboardCreate({ navigation, route }: any) {
     setName('');
     setDescription('');
     setNumKeys('');
+    setLed('');
+    setHotswap('');
     setSwitches('');
     setBuildDays('');
     setPrice('');
@@ -118,6 +132,24 @@ export default function KeyboardCreate({ navigation, route }: any) {
           keyboardType='decimal-pad'
           value={numKeys}
           onChangeText={setNumKeys}
+        />
+
+        <Text style={styles.label}>LED*</Text>
+        <TextInput
+          style={styles.input}
+          placeholder='1 ou 0'
+          keyboardType='number-pad'
+          value={led}
+          onChangeText={setLed}
+        />
+
+        <Text style={styles.label}>Hotswap*</Text>
+        <TextInput
+          style={styles.input}
+          placeholder='1 ou 0'
+          keyboardType='number-pad'
+          value={hotswap}
+          onChangeText={setHotswap}
         />
 
         <Text style={styles.label}>Switches*</Text>
