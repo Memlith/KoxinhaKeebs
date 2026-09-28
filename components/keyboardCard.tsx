@@ -30,23 +30,23 @@ export default function KeyboardCard({
         />
       )}
 
-      <Text>
+      <Text style={styles.body}>
         {description}
       </Text>
 
-      <Text>
+      <Text style={styles.body}>
         Teclas: {numKeys}
       </Text>
 
-      <Text>
+      <Text style={styles.body}>
         Switches: {switches}
       </Text>
 
-      <Text>
+      <Text style={styles.body}>
         LED: {Boolean(led) ? 'Sim' : 'Não'}
       </Text>
 
-      <Text>
+      <Text style={styles.body}>
         Hotswap: {Boolean(hotswap) ? 'Sim' : 'Não'}
       </Text>
 
@@ -71,18 +71,26 @@ const styles = StyleSheet.create({
     padding: 20,
     margin: 10,
     borderRadius: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1d24',
+    borderWidth: 1,
+    borderColor: '#2f3644',
   },
 
   name: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#f2f4f8',
+  },
+
+  body: {
+    color: '#9aa3b2',
   },
 
   price: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
+    color: '#a5b4fc',
   },
 
   image: {
@@ -91,10 +99,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 12,
     marginBottom: 12,
+    backgroundColor: '#232833',
   },
 
   button: {
-    backgroundColor: '#222',
+    backgroundColor: '#4f46e5',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 8,

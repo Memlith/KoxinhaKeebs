@@ -112,6 +112,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
         <Text style={styles.label}>Nome*</Text>
         <TextInput
           style={styles.input}
+          placeholderTextColor='#9aa3b2'
           placeholder='Nomeie seu teclado'
           value={name}
           onChangeText={setName}
@@ -120,6 +121,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
         <Text style={styles.label}>Descrição</Text>
         <TextInput
           style={styles.input}
+          placeholderTextColor='#9aa3b2'
           placeholder='Descreva seu teclado'
           value={description}
           onChangeText={setDescription}
@@ -128,6 +130,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
         <Text style={styles.label}>Teclas*</Text>
         <TextInput
           style={styles.input}
+          placeholderTextColor='#9aa3b2'
           placeholder='Exemplo: 86'
           keyboardType='decimal-pad'
           value={numKeys}
@@ -137,6 +140,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
         <Text style={styles.label}>LED*</Text>
         <TextInput
           style={styles.input}
+          placeholderTextColor='#9aa3b2'
           placeholder='1 ou 0'
           keyboardType='number-pad'
           value={led}
@@ -146,6 +150,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
         <Text style={styles.label}>Hotswap*</Text>
         <TextInput
           style={styles.input}
+          placeholderTextColor='#9aa3b2'
           placeholder='1 ou 0'
           keyboardType='number-pad'
           value={hotswap}
@@ -155,6 +160,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
         <Text style={styles.label}>Switches*</Text>
         <TextInput
           style={styles.input}
+          placeholderTextColor='#9aa3b2'
           placeholder='Escolha seu switch'
           value={switches}
           onChangeText={setSwitches}
@@ -163,6 +169,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
         <Text style={styles.label}>Dias de montagem</Text>
         <TextInput
           style={styles.input}
+          placeholderTextColor='#9aa3b2'
           placeholder='Exemplo: 2'
           keyboardType='decimal-pad'
           value={buildDays}
@@ -172,6 +179,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
         <Text style={styles.label}>Preço*</Text>
         <TextInput
           style={styles.input}
+          placeholderTextColor='#9aa3b2'
           placeholder='Digite o preço'
           keyboardType='decimal-pad'
           value={price}
@@ -181,6 +189,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
         <Text style={styles.label}>URL da imagem</Text>
         <TextInput
           style={styles.input}
+          placeholderTextColor='#9aa3b2'
           placeholder='https://exemplo.com/teclado.jpg'
           value={imageUrl}
           onChangeText={setImageUrl}
@@ -200,6 +209,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#0f1115',
   },
 
   content: {
@@ -217,31 +227,35 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: '#f2f4f8',
   },
 
   description: {
     fontSize: 16,
     marginTop: 10,
+    color: '#9aa3b2',
   },
 
   label: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
+    color: '#f2f4f8',
   },
 
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: '#232833',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#2f3644',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     marginBottom: 20,
+    color: '#f2f4f8',
   },
 
   button: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#4f46e5',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',

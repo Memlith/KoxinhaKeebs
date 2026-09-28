@@ -59,6 +59,7 @@ export default function Home({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#0f1115',
   },
 
   content: {
@@ -81,21 +82,23 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: '#f2f4f8',
   },
 
   description: {
     fontSize: 16,
     marginTop: 10,
+    color: '#9aa3b2',
   },
 
   footer: {
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: '#2f3644',
   },
 
   button: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#4f46e5',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',

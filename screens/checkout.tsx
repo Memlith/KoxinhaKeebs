@@ -106,6 +106,7 @@ export default function Checkout({ route, navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#0f1115',
   },
 
   scrollContent: {
@@ -119,11 +120,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: '#f2f4f8',
   },
 
   description: {
     fontSize: 16,
     marginTop: 10,
+    color: '#9aa3b2',
   },
 
   content: {
@@ -138,19 +141,24 @@ const styles = StyleSheet.create({
   totalLabel: {
     fontSize: 20,
     fontWeight: 'bold',
+    color: '#a5b4fc',
   },
 
   empty: {
     padding: 20,
     fontSize: 16,
+    color: '#9aa3b2',
   },
 
   footer: {
     padding: 20,
+    backgroundColor: '#1a1d24',
+    borderTopWidth: 1,
+    borderTopColor: '#2f3644',
   },
 
   button: {
-    backgroundColor: '#222',
+    backgroundColor: '#4f46e5',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 8,

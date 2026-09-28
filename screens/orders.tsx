@@ -67,6 +67,7 @@ export default function Orders() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#0f1115',
   },
 
   banner: {
@@ -76,17 +77,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: '#f2f4f8',
   },
 
   description: {
     fontSize: 16,
     marginTop: 10,
+    color: '#9aa3b2',
   },
 
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1d24',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#2f3644',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 20,
@@ -97,16 +100,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#f2f4f8',
   },
 
   price: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#a5b4fc',
   },
 
   date: {
     fontSize: 13,
-    color: '#888',
+    color: '#9aa3b2',
     marginTop: 6,
   },
 });

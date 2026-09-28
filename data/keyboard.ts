@@ -143,3 +143,12 @@ export const keyboards = [
     createdAt: new Date('2024-09-10T17:50:00Z').toISOString(),
   },
 ]
+
+export const categoryImages: Record<KeyboardCategory, string> = {
+  keyboard:
+    'https://upload.wikimedia.org/wikipedia/commons/5/5a/Mechanical_Keyboard.jpg',
+  splitKeyboard:
+    'https://upload.wikimedia.org/wikipedia/commons/c/cd/Ergodox_%2815322160951%29.jpg',
+  macropad:
+    'https://upload.wikimedia.org/wikipedia/commons/7/7b/Razer_Orbweaver_Mechanical_PC_Gaming_Keypad.jpg',
+}
