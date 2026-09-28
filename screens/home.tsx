@@ -2,14 +2,11 @@ import { View, Text, StyleSheet } from 'react-native';
 import Header from '../components/header';
 import CategoryCard from '../components/categoryCard';
 
-export default function Home({ navigation }: any) {
+export default function Home() {
   return (
     <View style={styles.container}>
       <View>
-        <Header
-          onBackPress={() => navigation.goBack()}
-          canGoBack={navigation.canGoBack()}
-        />
+        <Header />
       </View>
 
       <View style={styles.banner}>

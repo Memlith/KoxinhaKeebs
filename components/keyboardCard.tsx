@@ -42,7 +42,6 @@ export default function KeyboardCard({
         <Image
           source={{ uri: imageUrl }}
           style={styles.image}
-          accessibilityLabel={`Imagem do teclado ${name}`}
         />
       )}
 
@@ -74,9 +73,6 @@ export default function KeyboardCard({
         <Pressable
           style={styles.button}
           onPress={onPressCheckout}
-          accessibilityRole='button'
-          accessibilityLabel={`Comprar o teclado ${name}`}
-          accessibilityHint='Abre a tela para confirmar o pedido'
         >
           <Text style={styles.buttonText}>Quero esse</Text>
         </Pressable>
@@ -117,6 +113,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
   },
 
   buttonText: {

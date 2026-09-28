@@ -8,77 +8,55 @@ export default function Checkout({ route, navigation }: any) {
   const db = useSQLiteContext();
   const id = route.params.id;
   const [keyboard, setKeyboard] = useState<Keyboard | null>(null);
-  const [isFinishing, setIsFinishing] = useState(false);
-  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     async function loadKeyboard() {
-      try {
-        const result = await db.getFirstAsync(
-          `
-            SELECT *
-            FROM keyboards
-            WHERE id = ?
-          `,
-          id
-        ) as Keyboard | null;
+      const result = await db.getFirstAsync(
+        `
+          SELECT *
+          FROM keyboards
+          WHERE id = ?
+        `,
+        id
+      ) as Keyboard | null;
 
-        if (!result) {
-          setLoadError('Teclado não encontrado. Volte ao catálogo e escolha outro modelo.');
-          return;
-        }
-
-        setKeyboard(result);
-      } catch {
-        setLoadError('Não foi possível carregar o teclado. Tente novamente.');
-      }
+      setKeyboard(result);
     }
 
     void loadKeyboard();
   }, [db, id]);
 
   async function finishOrder() {
-    if (!keyboard || isFinishing) {
+    if (!keyboard) {
       return;
     }
 
-    setIsFinishing(true);
+    const totalPrice = Number(keyboard.finalPrice || keyboard.avgPrice);
 
-    try {
-      const totalPrice = Number(keyboard.finalPrice || keyboard.avgPrice);
+    await db.runAsync(
+      `INSERT INTO orders (keyboardId, keyboardName, totalPrice)
+       VALUES (?, ?, ?)`,
+      keyboard.id,
+      keyboard.name,
+      totalPrice,
+    );
 
-      await db.runAsync(
-        `INSERT INTO orders (keyboardId, keyboardName, totalPrice)
-         VALUES (?, ?, ?)`,
-        keyboard.id,
-        keyboard.name,
-        totalPrice,
-      );
-
-      Alert.alert(
-        'Pedido confirmado!',
-        'Seu pedido foi salvo neste dispositivo.',
-        [
-          {
-            text: 'Voltar ao início',
-            onPress: () => navigation.navigate('Home'),
-          },
-        ]
-      );
-    } catch {
-      Alert.alert('Erro', 'Não foi possível confirmar o pedido. Tente novamente.');
-    } finally {
-      setIsFinishing(false);
-    }
+    Alert.alert(
+      'Pedido confirmado!',
+      'Seu pedido foi salvo neste dispositivo.',
+      [
+        {
+          text: 'Voltar ao início',
+          onPress: () => navigation.navigate('Home'),
+        },
+      ]
+    );
   }
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Header
-          onBackPress={() => navigation.goBack()}
-          canGoBack={navigation.canGoBack()}
-        />
+        <Header />
 
         <View style={styles.banner}>
           <Text style={styles.title}>
@@ -93,8 +71,8 @@ export default function Checkout({ route, navigation }: any) {
           {keyboard ? (
             <KeyboardCard {...keyboard} isCheckout />
           ) : (
-            <Text style={styles.empty} accessibilityRole='alert'>
-              {loadError || 'Carregando teclado...'}
+            <Text style={styles.empty}>
+              Carregando teclado...
             </Text>
           )}
         </View>
@@ -102,16 +80,11 @@ export default function Checkout({ route, navigation }: any) {
 
       <View style={styles.footer}>
         <Pressable
-          style={[styles.button, (!keyboard || isFinishing) && styles.buttonDisabled]}
+          style={styles.button}
           onPress={finishOrder}
-          disabled={!keyboard || isFinishing}
-          accessibilityRole='button'
-          accessibilityLabel='Finalizar compra'
-          accessibilityHint='Salva o pedido neste dispositivo'
-          accessibilityState={{ disabled: !keyboard || isFinishing }}
         >
           <Text style={styles.buttonText}>
-            {isFinishing ? 'Salvando pedido...' : 'Finalizar Compra'}
+            Finalizar Compra
           </Text>
         </Pressable>
       </View>
@@ -161,10 +134,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderRadius: 8,
     alignItems: 'center',
-  },
-
-  buttonDisabled: {
-    backgroundColor: '#777',
   },
 
   buttonText: {

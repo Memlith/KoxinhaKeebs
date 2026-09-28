@@ -13,7 +13,7 @@ export default function App() {
   return (
     <SQLiteProvider databaseName="koxinhakeebs.db" onInit={startDatabase}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator>
 
           <Stack.Screen
             name="Home"

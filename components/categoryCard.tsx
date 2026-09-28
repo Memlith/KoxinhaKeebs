@@ -7,9 +7,6 @@ export default function CategoryCard(props: any) {
   return (
     <Pressable
       onPress={() => navigation.navigate('Catalog', { category: props.category })}
-      accessibilityRole='button'
-      accessibilityLabel={`Ver teclados da categoria ${props.name}`}
-      accessibilityHint='Abre a lista de teclados desta categoria'
     >
       <View style={styles.card}>
         <Text style={styles.icon}>{props.icon}</Text>

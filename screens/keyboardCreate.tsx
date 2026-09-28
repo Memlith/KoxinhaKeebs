@@ -10,13 +10,12 @@ export default function KeyboardCreate({ navigation, route }: any) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [numKeys, setNumKeys] = useState('');
-  const [price, setPrice] = useState('');
   const [led, setLed] = useState(false);
   const [hotswap, setHotswap] = useState(false);
   const [switches, setSwitches] = useState('');
   const [imageUrl, setImageUrl] = useState('');
 
-  function calcBuildDays(keys: number, keyboardCategory: string, hasLed: boolean, hasHotswap: boolean): number {
+  function calcAvgDays(keys: number, keyboardCategory: string, hasLed: boolean, hasHotswap: boolean): number {
     const halfKeys = keys * 0.5;
     let hours = halfKeys;
 
@@ -28,10 +27,12 @@ export default function KeyboardCreate({ navigation, route }: any) {
     return Math.ceil(hours / 24);
   }
 
+  function calcPrice(days: number): number {
+    return Math.round(days * 50);
+  }
+
   async function saveKeyboard() {
     const totalKeys = Number(numKeys);
-    const manualPrice = Number(price.replace(',', '.'));
-    const normalizedImageUrl = imageUrl.trim();
 
     if (!name.trim()) {
       Alert.alert('Atenção', 'Informe o nome do teclado.');
@@ -43,38 +44,29 @@ export default function KeyboardCreate({ navigation, route }: any) {
       return;
     }
 
-    if (!/^\d+(?:[.,]\d{1,2})?$/.test(price) || manualPrice <= 0) {
-      Alert.alert('Atenção', 'Informe um preço válido. Exemplo: 150,00');
-      return;
-    }
-
     if (!switches.trim()) {
       Alert.alert('Atenção', 'Informe os switches do teclado.');
       return;
     }
 
-    if (normalizedImageUrl && !/^https?:\/\/.+/i.test(normalizedImageUrl)) {
-      Alert.alert('Atenção', 'Informe uma URL pública que comece com http:// ou https://.');
-      return;
-    }
-
-    const calculatedBuildDays = calcBuildDays(totalKeys, category, led, hotswap);
+    const calculatedBuildDays = calcAvgDays(totalKeys, category, led, hotswap);
+    const calculatedPrice = calcPrice(calculatedBuildDays);
 
     await db.runAsync(
       `INSERT INTO keyboards
         (name, description, category, numKeys, led, hotswap, switches, avgBuildDays, avgPrice, finalPrice, imageUrl)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      name.trim(),
-      description.trim(),
+      name,
+      description,
       category,
       totalKeys,
       led ? 1 : 0,
       hotswap ? 1 : 0,
-      switches.trim(),
+      switches,
       calculatedBuildDays,
-      manualPrice,
-      manualPrice,
-      normalizedImageUrl || null,
+      calculatedPrice,
+      calculatedPrice,
+      imageUrl || null,
     );
 
     Alert.alert(
@@ -91,7 +83,6 @@ export default function KeyboardCreate({ navigation, route }: any) {
     setName('');
     setDescription('');
     setNumKeys('');
-    setPrice('');
     setLed(false);
     setHotswap(false);
     setSwitches('');
@@ -100,10 +91,7 @@ export default function KeyboardCreate({ navigation, route }: any) {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Header
-        onBackPress={() => navigation.goBack()}
-        canGoBack={navigation.canGoBack()}
-      />
+      <Header />
 
       <View style={styles.banner}>
         <Text style={styles.title}>
@@ -125,8 +113,6 @@ export default function KeyboardCreate({ navigation, route }: any) {
           placeholder='Nomeie seu teclado'
           value={name}
           onChangeText={setName}
-          accessibilityLabel='Nome do teclado'
-          accessibilityHint='Campo obrigatório'
         />
 
         <Text style={styles.label}>Descrição</Text>
@@ -136,7 +122,6 @@ export default function KeyboardCreate({ navigation, route }: any) {
           value={description}
           onChangeText={setDescription}
           multiline
-          accessibilityLabel='Descrição do teclado'
         />
 
         <Text style={styles.label}>Teclas*</Text>
@@ -146,19 +131,6 @@ export default function KeyboardCreate({ navigation, route }: any) {
           keyboardType='number-pad'
           value={numKeys}
           onChangeText={(text) => setNumKeys(text.replace(/[^0-9]/g, ''))}
-          accessibilityLabel='Quantidade de teclas'
-          accessibilityHint='Informe um número inteiro maior que zero'
-        />
-
-        <Text style={styles.label}>Preço*</Text>
-        <TextInput
-          style={styles.input}
-          placeholder='Exemplo: 150,00'
-          keyboardType='decimal-pad'
-          value={price}
-          onChangeText={setPrice}
-          accessibilityLabel='Preço do teclado'
-          accessibilityHint='Campo obrigatório. Use vírgula ou ponto para os centavos.'
         />
 
         <Text style={styles.label}>RGB</Text>
@@ -166,8 +138,6 @@ export default function KeyboardCreate({ navigation, route }: any) {
           value={led}
           onValueChange={setLed}
           style={styles.switch}
-          accessibilityLabel='Iluminação RGB'
-          accessibilityHint='Ative se o teclado possuir iluminação RGB'
         />
 
         <Text style={styles.label}>Hotswap</Text>
@@ -175,8 +145,6 @@ export default function KeyboardCreate({ navigation, route }: any) {
           value={hotswap}
           onValueChange={setHotswap}
           style={styles.switch}
-          accessibilityLabel='Hotswap'
-          accessibilityHint='Ative se os switches puderem ser trocados sem solda'
         />
 
         <Text style={styles.label}>Switches*</Text>
@@ -185,8 +153,6 @@ export default function KeyboardCreate({ navigation, route }: any) {
           placeholder='Escolha seu switch'
           value={switches}
           onChangeText={setSwitches}
-          accessibilityLabel='Switches do teclado'
-          accessibilityHint='Campo obrigatório'
         />
 
         <Text style={styles.label}>URL da imagem</Text>
@@ -198,16 +164,11 @@ export default function KeyboardCreate({ navigation, route }: any) {
           keyboardType='url'
           autoCapitalize='none'
           autoCorrect={false}
-          accessibilityLabel='URL da imagem do teclado'
-          accessibilityHint='Campo opcional. Informe uma imagem pública que comece com http:// ou https://.'
         />
 
         <Pressable
           style={styles.button}
           onPress={saveKeyboard}
-          accessibilityRole='button'
-          accessibilityLabel='Salvar teclado'
-          accessibilityHint='Salva o teclado no catálogo'
         >
           <Text style={styles.buttonText}>Salvar</Text>
         </Pressable>
