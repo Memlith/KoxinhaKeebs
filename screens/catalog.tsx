@@ -34,6 +34,18 @@ export default function Catalog({ route, navigation }: any) {
 
   return (
     <View style={styles.container}>
+      <View>
+        <Header />
+
+        <View style={styles.banner}>
+          <Text style={styles.title}>
+            Ergonomia e estilo na sua rotina.
+          </Text>
+          <Text style={styles.description}>
+            Melhore seu tec tec.
+          </Text>
+        </View>
+      </View>
       <FlatList
         data={keyboards}
         keyExtractor={(item) => item.id.toString()}
@@ -43,22 +55,7 @@ export default function Catalog({ route, navigation }: any) {
             onBuyNow={() => buyNow(item)}
           />
         )}
-        ListHeaderComponent={
-          <View>
-            <Header />
-
-            <View style={styles.banner}>
-              <Text style={styles.title}>
-                Ergonomia e estilo na sua rotina.
-              </Text>
-              <Text style={styles.description}>
-                Melhore seu tec tec.
-              </Text>
-            </View>
-          </View>
-        }
-        />
-
+      />
       <View style={styles.footer}>
         <Pressable
           style={styles.button}

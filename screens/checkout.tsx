@@ -46,7 +46,7 @@ export default function Checkout({ route, navigation }: any) {
 
     Alert.alert(
       'Pedido confirmado!',
-      'Seu pedido foi salvo neste dispositivo.',
+      'Seu pedido foi salvo.',
       [
         {
           text: 'Voltar ao início',
